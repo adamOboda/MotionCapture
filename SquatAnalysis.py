@@ -23,9 +23,9 @@ def calculate_angle(a, b, c):
 
     return angle
 
-def rescale_frame(frame, percent=50):
-    width = int(frame.shape[1] * percent/ 100)
-    height = int(frame.shape[0] * percent/ 100)
+def rescale_frame(frame, percent=100):
+    width = int(frame.shape[1] * percent/ 50)
+    height = int(frame.shape[0] * percent/ 50)
     dim = (width, height)
     return cv2.resize(frame, dim, interpolation =cv2.INTER_AREA)
 
@@ -33,7 +33,7 @@ def rescale_frame(frame, percent=50):
 angle_min = []
 angle_min_hip = []
 angle_min_ankle = []
-cap = cv2.VideoCapture('poseVideos/2.mp4')
+cap = cv2.VideoCapture('poseVideos/4.mp4')
 
 
 # Curl counter variables
@@ -67,6 +67,16 @@ out = cv2.VideoWriter('output_video2_.mp4', fourcc, 24, size)
 with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
     while cap.isOpened():
         ret, frame = cap.read()
+
+        # if ret:
+        #     cv2.imshow("Image", frame)
+        # else:
+        #     print('no video')
+        #     cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        #
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
+
         if frame is not None:
             frame_ = rescale_frame(frame, percent=75)
 
@@ -112,26 +122,26 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
             angle_min.append(angle_knee)
             angle_min_hip.append(angle_hip)
 
-            # Real time measurement - elbow
-            cv2.putText(image, str(angle),
-                        tuple(np.multiply(elbow, [640, 600]).astype(int)),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA
-                                            )
+            # # Real time measurement - elbow
+            # cv2.putText(image, str(angle),
+            #             tuple(np.multiply(elbow, [640, 600]).astype(int)),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA
+            #                                 )
             # Real time measurement - knee
             cv2.putText(image, str(angle_knee),
-                        tuple(np.multiply(knee, [850, 550]).astype(int)),
+                        tuple(np.multiply(knee, [500, 1100]).astype(int)),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA
                         )
             # Real time measurement - hip
             cv2.putText(image, str(angle_hip),
-                        tuple(np.multiply(hip, [1100, 550]).astype(int)),
+                        tuple(np.multiply(hip, [500, 1100]).astype(int)),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA
                         )
             #Real Time measurement - Ankle
-            cv2.putText(image, str(angle_ankle),
-                        tuple(np.multiply(heel, [980, 550]).astype(int)),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA
-                        )
+            # cv2.putText(image, str(angle_ankle),
+            #             tuple(np.multiply(heel, [980, 550]).astype(int)),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA
+            #             )
 
             if angle_knee > 169:
                 stage = "up"
@@ -148,15 +158,15 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                 min_ang_hip = min(angle_min_hip)
                 max_ang_hip = max(angle_min_hip)
 
-                min_ang_ankle = min(angle_min_ankle)
-                max_ang_ankle = max(angle_ankle)
+                # min_ang_ankle = min(angle_min_ankle)
+                # max_ang_ankle = max(angle_ankle)
 
                 print(min(angle_min), " _ ", max(angle_min))
                 print(min(angle_min_hip), " _ ", max(angle_min_hip))
                 print(min(angle_min_ankle), " _ ", max(angle_min_ankle))
                 angle_min = []
                 angle_min_hip = []
-                angle_min_ankle = []
+                # angle_min_ankle = []
 
 
 
@@ -191,13 +201,14 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                                   mpdrawing.DrawingSpec(color=(203, 17, 17), thickness=2, circle_radius=2)
                                   )
         out.write(image)
-        cv2.imshow('Mediapipe Feed', image)
+        # Loop
+        if ret:
+            cv2.imshow("Squat Analysis", image)
+        else:
+            print('no video')
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
 
-        if cv2.waitKey(10) & 0xFF == ord('q'):
             cap.release()
-            out.release()
             cv2.destroyAllWindows()
-
-cap.release()
-out.release()
-cv2.destroyAllWindows()
+            break
