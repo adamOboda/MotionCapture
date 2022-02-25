@@ -1,6 +1,8 @@
 import cv2
 import mediapipe as mp
 
+
+
 class poseDetector():
 
     def __init__(self, mode=False, modelCompl = 1, smoothLand = True, enablSegm = False, smooth=True, detectionCon = 0.5, trackCon=0.5):
@@ -38,6 +40,9 @@ def main():
         img = detector.findPose(img)
         cv2.imshow("Image", img)
         cv2.waitKey(1)
+
+
+
 
 if __name__ == "__main__":
     main()
