@@ -4,6 +4,7 @@ import mediapipe as mp
 import numpy as np
 
 
+
 mpdrawing = mp.solutions.drawing_utils
 mp_drawing_styles = mp.solutions.drawing_styles
 mp_pose = mp.solutions.pose
@@ -46,36 +47,17 @@ min_ang_ankle = 0
 max_ang_ankle = 0
 stage = None
 
-width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH) + 0.5)
-height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) + 0.5)
-size = (640, 480)
-fourcc = cv2.VideoWriter_fourcc(*'MP4V')
-out = cv2.VideoWriter('output_video2_.mp4', fourcc, 24, size)
+# width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH) + 0.5)
+# height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) + 0.5)
+size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+out = cv2.VideoWriter('./PoseVideos/squat_analysis2.mp4', fourcc, 29.0, size)
 
 
-# while True:
-#     succes, img = cap.read()
-#     imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-#     results = pose.process(imgRGB)
-#     print(results.pose_landmarks)
-#     if results.pose_landmarks:
-#         mpdrawing.draw_landmarks(img, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
-#
-#     cv2.imshow("Image", img)
-#     cv2.waitKey(1)
 
 with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
     while cap.isOpened():
         ret, frame = cap.read()
-
-        # if ret:
-        #     cv2.imshow("Image", frame)
-        # else:
-        #     print('no video')
-        #     cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-        #
-        # if cv2.waitKey(1) & 0xFF == ord('q'):
-        #     break
 
         if frame is not None:
             frame_ = rescale_frame(frame, percent=75)
@@ -142,13 +124,14 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
             #             tuple(np.multiply(heel, [980, 550]).astype(int)),
             #             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA
             #             )
-
+            min_ang = min(angle_min)
+            min_ang_hip = min(angle_min_hip)
             if angle_knee > 169:
                 stage = "up"
                 # counter = 0
                 # min_ang_hip = 0
                 # min_ang = 0
-            if angle_knee <= 90 and stage == 'up':
+            if angle_knee <= angle_knee < 90 and stage == 'up':
                 stage = "down"
                 counter += 1
                 print(counter)
@@ -201,14 +184,23 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
                                   mpdrawing.DrawingSpec(color=(203, 17, 17), thickness=2, circle_radius=2)
                                   )
         out.write(image)
+        cv2.imshow('Mediapipe Feed', image)
+
         # Loop
         if ret:
-            cv2.imshow("Squat Analysis", image)
-        else:
-            print('no video')
-            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
 
+            cv2.waitKey(1) & 0xFF == ord('q')
+            # cv2.imshow("Squat Analysis", image)
+        else:
+
+            # printerror = print('no video')
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        if counter > 3 and stage == "up":
             cap.release()
             cv2.destroyAllWindows()
-            break
+
+
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()
+

@@ -25,6 +25,8 @@ class poseDetector():
         self.pose = self.mpPose.Pose(self.mode, self.modelCompl, self.smoothLand, self.enablSegm, self.smooth, self.detectionCon, self.trackCon)
 
     def findPose(self, img, draw = True):
+
+
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         self.results = self.pose.process(imgRGB)
         if self.results.pose_landmarks:
@@ -33,13 +35,14 @@ class poseDetector():
         return img
 
 def main():
-    cap = cv2.VideoCapture('poseVideos/2.mp4')
+    cap = cv2.VideoCapture('poseVideos/1.mp4')
     detector = poseDetector()
     while True:
         succes, img = cap.read()
         img = detector.findPose(img)
         cv2.imshow("Image", img)
         cv2.waitKey(1)
+        break
 
 
 

@@ -33,7 +33,7 @@ def rescale_frame(frame, percent=50):
 angle_min = []
 angle_min_hip = []
 angle_min_ankle = []
-cap = cv2.VideoCapture('poseVideos/2.mp4')
+cap = cv2.VideoCapture('poseVideos/1.mp4')
 
 
 # Curl counter variables
@@ -50,7 +50,7 @@ width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH) + 0.5)
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) + 0.5)
 size = (640, 480)
 fourcc = cv2.VideoWriter_fourcc(*'MP4V')
-out = cv2.VideoWriter('output_video2_.mp4', fourcc, 24, size)
+out = cv2.VideoWriter('output_video_.mp4', fourcc, 24, size)
 
 
 # while True:
@@ -193,11 +193,18 @@ with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as 
         out.write(image)
         cv2.imshow('Mediapipe Feed', image)
 
+
+
         if cv2.waitKey(10) & 0xFF == ord('q'):
             cap.release()
             out.release()
             cv2.destroyAllWindows()
 
+
+
 cap.release()
 out.release()
 cv2.destroyAllWindows()
+
+
+
